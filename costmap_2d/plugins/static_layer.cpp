@@ -65,7 +65,11 @@ void StaticLayer::onInitialize()
   global_frame_ = layered_costmap_->getGlobalFrameID();
 
   std::string map_topic;
-  nh.param("map_topic", map_topic, std::string("map"));
+  // nh.param("map_topic", map_topic, std::string("map"));
+
+  // this did the trick
+  nh.param("map_topic", map_topic, std::string("/costmap_node/costmap/costmap"));
+  
   nh.param("first_map_only", first_map_only_, false);
   nh.param("subscribe_to_updates", subscribe_to_updates_, false);
 
@@ -84,7 +88,7 @@ void StaticLayer::onInitialize()
   if (map_sub_.getTopic() != ros::names::resolve(map_topic))
   {
     // we'll subscribe to the latched topic that the map server uses
-    ROS_INFO("Requesting the map...");
+    ROS_INFO_STREAM("Requesting the map " << map_topic <<", but got map "<< map_sub_.getTopic());
     map_sub_ = g_nh.subscribe(map_topic, 1, &StaticLayer::incomingMap, this);
     map_received_ = false;
     has_updated_data_ = false;
